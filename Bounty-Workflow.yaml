@@ -1,0 +1,111 @@
+vars:
+  SUBDOMAINS_FILE: "allsubs"
+  WORKERS: "4000"
+  RATE: "2000"
+  HTTPX_RATE_LIMIT: "300"
+  OUTPUT_DNSX: "dnsx"
+  OUTPUT_NAABU: "naabu"
+  OUTPUT_NAABU_IP: "ipNaabu"
+  OUTPUT_HTTPX: "aliveSubs"
+  OUTPUT_HTTPX_IP: "aliveIpSubs"
+  OUTPUT_NUCLEI: "nuclei"
+  OUTPUT_NUCLEI_IP: "nucleiIps"
+  OUTPUT_SUBJACK: "subjackTakeover"
+  OUTPUT_SUBZY: "subzyTakeover"
+  OUTPUT_WAYBACKURLS: "waybackurls"
+  OUTPUT_GAU: "gau"
+  OUTPUT_GAUPLUS: "gauplus"
+  OUTPUT_HAKRAWLER: "hakrawler"
+  OUTPUT_KATANA: "katana"
+  OUTPUT_ARJUN1: "arjun1"
+  OUTPUT_ARJUN2: "arjun2"
+  OUTPUT_PARAMSPIDER: "paramspider"
+  OUTPUT_ENDPOINTS_CLEAN: "endpointsClean"
+  OUTPUT_ENDPOINTS_HTTP: "endpointsHttp"
+  OUTPUT_ENDPOINTS: "endpoints"
+  OUTPUT_ALIVE_ENDPOINTS: "aliveEndpoints"
+  OUTPUT_JS_GAU: "gauJS"
+  OUTPUT_JS_WAYBACKURLS: "waybackurlsJS"
+  OUTPUT_JS_GETJS: "getJS"
+  OUTPUT_JS_KATANA: "katanaJS"
+  OUTPUT_JS_GOSPIDER: "gospiderJS"
+  OUTPUT_JS_HAKRAWLER1: "hakrawler1JS"
+  OUTPUT_JS_HAKRAWLER2: "hakrawler2JS"
+  OUTPUT_JS_DIRSEARCH: "dirsearchJS"
+  OUTPUT_ALL_JS: "allJS"
+  OUTPUT_JUST_JS: "justJS"
+  OUTPUT_JS_200: "JS200"
+  OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
+  
+parallel: false
+modules:
+  - name: Subdomain Enumeration
+    cmds:
+      - ./Enum-Machine.sh url
+      - cat jldc_* bufferover_* rapiddns_* riddler_* virustotal_* archive_* sonar_* synapsint_* haktrails_* assetfinder_* subfinder_* amass1_* amass2_* amass3_* chaos_* github_* findomain_* sublist3r_* knock_* | anew {{SUBDOMAINS_FILE}}
+      - rm -rf jldc_* bufferover_* rapiddns_* riddler_* virustotal_* archive_* sonar_* synapsint_* haktrails_* assetfinder_* subfinder_* amass1_* amass2_* amass3_* chaos_* github_* findomain_* sublist3r_* knock_*
+    silent: true
+  - name: Resolving Subdomains
+    cmds:
+      - cat {{SUBDOMAINS_FILE}} | dnsx -resp-only -a -silent -t {{WORKERS}} | tee {{OUTPUT_DNSX}}
+      - cat {{SUBDOMAINS_FILE}} | naabu -silent -c {{WORKERS}} -rate {{RATE}} -p - | tee {{OUTPUT_NAABU}}
+      - cat {{OUTPUT_DNSX}} | naabu -silent -c {{WORKERS}} -rate {{RATE}} -p - | tee {{OUTPUT_NAABU_IP}}
+      - cat {{OUTPUT_NAABU}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX}}
+      - cat {{OUTPUT_NAABU_IP}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX_IP}} 
+    silent: true
+  - name: Nuclei First Step
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | nuclei -etags ssl,netlify -severity low,medium,high,critical -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI}} | notify
+      - cat {{OUTPUT_HTTPX_IP}} | nuclei -etags ssl,netlify -severity low,medium,high,critical -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI_IP}} | notify
+    silent: true
+  - name: Nuclei Swagger
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | nuclei -tags swagger -t ~/nuclei-templates -o swagger | notify
+    silent: true
+  - name: Subdomain Takeover
+    cmds:
+      - subjack -w {{OUTPUT_HTTPX}} -a -t {{WORKERS}} -o {{OUTPUT_SUBJACK}}
+      - subzy run --targets {{OUTPUT_HTTPX}} --concurrency {{WORKERS}} --hide_fails | tee {{OUTPUT_SUBZY}}
+    silent: true
+  - name: Endpoints Enumeration
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | waybackurls | uro | tee {{OUTPUT_WAYBACKURLS}}
+      - cat {{OUTPUT_HTTPX}} | gau --blacklist md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js | uro | tee {{OUTPUT_GAU}}
+      - cat {{OUTPUT_HTTPX}} | gauplus -b md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js -random-agent | uro | tee {{OUTPUT_GAUPLUS}}
+      - cat {{OUTPUT_HTTPX}} | hakrawler | uro | tee {{OUTPUT_HAKRAWLER}}
+      - katana -list {{OUTPUT_HTTPX}} -d 15 -silent -f qurl | uro | tee {{OUTPUT_KATANA}}
+      - arjun -i {{OUTPUT_HTTPX}} -oT {{OUTPUT_ARJUN1}}
+      - arjun -i {{OUTPUT_HTTPX}} -m POST -oT {{OUTPUT_ARJUN2}}
+      - xargs -a {{OUTPUT_HTTPX}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER}}
+      - cat {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAU}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}} | uro | grep -E '^[^:/?&]+://[^/]+/[^?]+\?[^ ]*=' | tee {{OUTPUT_ENDPOINTS_CLEAN}}
+      - cat {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAU}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}} | uro | grep -E 'https?://[^/]+/[^?]+\?[^ ]*=' | tee {{OUTPUT_ENDPOINTS_HTTP}}
+      - cat {{OUTPUT_ENDPOINTS_CLEAN}} {{OUTPUT_ENDPOINTS_HTTP}} | uro | anew {{OUTPUT_ENDPOINTS}}
+    silent: true
+  - name: Resolving Endpoints
+    cmds:
+      - cat {{OUTPUT_ENDPOINTS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} | anew {{OUTPUT_ALIVE_ENDPOINTS}}
+      - rm -rf {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAU}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}}
+    silent: true
+  - name: JS Enumeration
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | gau -subs | grep -iE '\.js'| grep -iEv '(\.jsp|\.json)' | tee {{OUTPUT_JS_GAU}}
+      - cat {{OUTPUT_HTTPX}} | waybackurls | grep -E '\.js(?:onp?)?$' | anew {{OUTPUT_JS_WAYBACKURLS}}
+      - cat {{OUTPUT_HTTPX}} | getJS --complete | anew {{OUTPUT_JS_GETJS}}
+      - cat {{OUTPUT_HTTPX}} | katana -d 15 -silent -em js,jsp,json -o {{OUTPUT_JS_KATANA}}
+      - cat {{OUTPUT_HTTPX}} | gospider --js | grep -E '\.js(?:onp?)?$' | awk '{print $4}' | tr -d '[]' | anew {{OUTPUT_JS_GOSPIDER}}
+      - cat {{OUTPUT_HTTPX}} | xargs -I% -P10 sh -c 'hakrawler -plain -linkfinder -depth 5 -url %' | awk '{{print $3}}' | grep -E '\.js(?:onp?)?$' | anew {{OUTPUT_JS_HAKRAWLER1}}
+      - cat {{OUTPUT_HTTPX}} | rush -j 100 'hakrawler -js -plain -usewayback -depth 6 -scope subs -url {} | unew {{OUTPUT_JS_HAKRAWLER2}}'
+      - cat {{OUTPUT_HTTPX}} | xargs -I@ sh -c 'python3 ~/Tools/dirsearch/dirsearch.py -r -b -w path -u @ -i 200, 403, 401, 302 -e json,js,jsp' | tee {{OUTPUT_JS_DIRSEARCH}}
+      - cat {{OUTPUT_JS_GAU}} {{OUTPUT_JS_WAYBACKURLS}} {{OUTPUT_JS_GETJS}} {{OUTPUT_JS_KATANA}} {{OUTPUT_JS_GOSPIDER}} {{OUTPUT_JS_HAKRAWLER1}} {{OUTPUT_JS_HAKRAWLER2}} {{OUTPUT_JS_DIRSEARCH}} | anew {{OUTPUT_ALL_JS}}
+      - cat {{OUTPUT_JS_GAU}} {{OUTPUT_JS_WAYBACKURLS}} {{OUTPUT_JS_GETJS}} {{OUTPUT_JS_KATANA}} {{OUTPUT_JS_GOSPIDER}} {{OUTPUT_JS_HAKRAWLER1}} {{OUTPUT_JS_HAKRAWLER2}} {{OUTPUT_JS_DIRSEARCH}} | grep -E '\.js$' | sort -u | tee {{OUTPUT_JUST_JS}}
+    silent: true
+  - name: Resolving JS
+    cmds:
+      - cat {{OUTPUT_ALL_JS}} | anti-burl | anew {{OUTPUT_JS_200}}
+      - cat {{OUTPUT_JUST_JS}} | anti-burl | anew {{OUTPUT_ALIVE_JUST_JS}}
+      - rm -rf {{OUTPUT_JS_GAU}} {{OUTPUT_JS_WAYBACKURLS}} {{OUTPUT_JS_GETJS}} {{OUTPUT_JS_KATANA}} {{OUTPUT_JS_GOSPIDER}} {{OUTPUT_JS_HAKRAWLER1}} {{OUTPUT_JS_HAKRAWLER2}} {{OUTPUT_JS_DIRSEARCH}}
+    silent: true
+  - name: JS Analysis
+    cmds:
+      -
+      -
