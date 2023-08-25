@@ -67,7 +67,7 @@ vars:
   OUTPUT_ALL_ALIVE_ENDPOINTS: "allAliveEndpoints"
   OUTPUT_GXSS: "reflectedParams"
   OUTPUT_DALFOX: "dalfox"
-  OUTPUT_NUCLEI_FUZZING_TEMPLATES: "fuzzingTemplates"
+  OUTPUT_NUCLEI_XSS_FUZZING_TEMPLATES: "xssFuzzingTemplates"
   OUTPUT_SQLMAP: "sqlmap"
   OUTPUT_SQL_SINTAX_ERROR: "sqlSyntaxError"
   OUTPUT_OPEN_REDIRECT_FUZZ: "openRedirectFuzz"
@@ -78,6 +78,12 @@ vars:
   OUTPUT_LFI_FFUF: "lfiFfuf"
   OUTPUT_SSRF_HTTPX: "ssrfHttpx"
   OUTPUT_SSTIMAP: "sstiMap"
+  OUTPUT_NUCLEI_FUZZING_TEMPLATES: "fuzzingTemplates"
+  OUTPUT_403_SUBS_HTTPX: "403subs"
+  OUTPUT_403_ENDPOINTS_HTTPX: "403endpoints"
+  OUTPUT_CRLF: "crlf"
+  OUTPUT_PPFUZZ: "ppfuzz"
+  OUTPUT_PPMAP: "ppmap"
   
 parallel: false
 modules:
@@ -209,7 +215,7 @@ modules:
     silent: true
   - name: XSS Module - Nuclei Fuzzing Templates
     cmds:
-      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | nuclei -t ~/fuzzing-templates/xss -o {{OUTPUT_NUCLEI_FUZZING_TEMPLATES}} | notify
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | nuclei -t ~/fuzzing-templates/xss -o {{OUTPUT_NUCLEI_XSS_FUZZING_TEMPLATES}} | notify
     silent: true
   - name: SQLI Module
     cmds:
@@ -220,7 +226,7 @@ modules:
   - name: Open Redirect Module
     cmds:
       - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | grep "=" | qsreplace FUZZ | tee {{OUTPUT_OPEN_REDIRECT_FUZZ}}; python3 ~/Tools/OpenRedireX/ openredirex.py -l {{OUTPUT_OPEN_REDIRECT_FUZZ}} -p ~/Wordlists/payloadsOpenRedirect.txt --keyword FUZZ | tee {{OUTPUT_OPENREDIREX}}
-      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | httpx -silent -path "//evil.com/..;/css" -mc 302 -status-code -match-string "Location: //evil.com/..;/css" | tee {{OUTPUT_OPEN_REDIRECT_HTTPX}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | httpx -silent -path "//evil.com/..;/css" -mc 302 -status-code -match-string "Location://evil.com/..;/css" | tee {{OUTPUT_OPEN_REDIRECT_HTTPX}}
       - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf redirect | rush -j40 'if curl -Iks -m 10 "{}/https://redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}/redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}////;@redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com" || curl -Iks -m 10 "{}/////redirect.com" | egrep "^(Location|location)\\:(| *| (http|https)\\:\\/\\/| *\\/\\/| [a-zA-Z]*\\.| (http|https)\\:\\/\\/[a-zA-Z]*\\.)redirect\\.com"; then echo "{} It seems an Open Redirect Found"; fi' | tee {{OUTPUT_OPEN_REDIRECT_RUSH}}
     silent: true
   - name: LFI Module
@@ -238,3 +244,25 @@ modules:
       - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | gf lfi | tee sstiEndpoints; xargs -a sstiEndpoints -I@ bash -c 'python3 ~/Tools/SSTImap/sstimap.py -u @' | tee {{OUTPUT_SSTIMAP}}
       - rm -rf sstiEndpoints
     silent: true
+  - name: Nuclei Fuzzing Templates Module
+    cmds:
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | nuclei -t ~/fuzzing-templates/ -o {{OUTPUT_NUCLEI_FUZZING_TEMPLATES}} | notify
+    silent: true
+  - name: Identify Subdomains and Endpoints 403
+    cmds:
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -mc 403 | {{OUTPUT_403_SUBS_HTTPX}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -mc 403 | {{OUTPUT_403_ENDPOINTS_HTTPX}}
+    silent: true  
+  - name: Bypass 403
+    cmds:
+      - echo "Need to do This"
+    silent: true
+  - name: CRLF Injection
+    cmds:
+      - crlfsuite -i {{OUTPUT_HTTPX_NEW_TARGETS}} -t {{WORKERS}} -sB | tee {{OUTPUT_CRLF}}
+    silent: true
+  - name: Prototype Pollution
+    cmds:
+      - ppfuzz -c {{WORKERS}} -l {{OUTPUT_HTTPX_NEW_TARGETS}} 2>/dev/null | tee {{OUTPUT_PPFUZZ}}
+      - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | ppmap | tee {{OUTPUT_PPMAP}}
+    silent: true                    
