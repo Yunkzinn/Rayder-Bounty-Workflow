@@ -86,6 +86,7 @@ vars:
   OUTPUT_CRLF: "crlf"
   OUTPUT_PPFUZZ: "ppfuzz"
   OUTPUT_PPMAP: "ppmap"
+  OUTPUT_HEADERPWN: "headerpwn"
   
 parallel: false
 modules:
@@ -240,7 +241,7 @@ modules:
 
   - name: XSS Module - Oneliners
     cmds:
-      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | qsreplace "<script>alert(1)</script>" > replacedUrls; cat replacedUrls | httpx -silent -threads 300 -ms "<script>alert(1)</script>" | tee {{OUTPUT_XSS_ONELINER_1}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | qsreplace "<script>alert(1)</script>" > replacedUrls; cat replacedUrls | httpx -silent -threads 300 -ms "<script>alert(1)</script>" | tee {{OUTPUT_XSS_ONELINER_1}}; rm -rf replacedUrls 
     silent: true    
 
   - name: SQLI Module
@@ -301,4 +302,9 @@ modules:
     cmds:
       - ppfuzz -c {{WORKERS}} -l {{OUTPUT_HTTPX_NEW_TARGETS}} 2>/dev/null | tee {{OUTPUT_PPFUZZ}}
       - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | ppmap | tee {{OUTPUT_PPMAP}}
-    silent: true                    
+    silent: true  
+
+  - name: HTTP Header Analysis
+    cmds:
+      - xargs -a {{OUTPUT_HTTPX_NEW_TARGETS}} -n 1 -P 10 headerpwn -headers ~/Wordlists/headers.txt -q -url | tee {{OUTPUT_HEADERPWN}}
+    silent: true                      
