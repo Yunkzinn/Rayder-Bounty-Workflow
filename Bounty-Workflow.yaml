@@ -84,6 +84,7 @@ vars:
   OUTPUT_403_SUBS_HTTPX: "403subs"
   OUTPUT_403_ENDPOINTS_HTTPX: "403endpoints"
   OUTPUT_CRLF: "crlf"
+  OUTPUT_CRLFUZZ: "crlfuzz"
   OUTPUT_PPFUZZ: "ppfuzz"
   OUTPUT_PPMAP: "ppmap"
   OUTPUT_HEADERPWN: "headerpwn"
@@ -129,7 +130,7 @@ modules:
       - cat {{OUTPUT_HTTPX}} | gau --blacklist md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js | uro | tee {{OUTPUT_GAU}}
       - cat {{OUTPUT_HTTPX}} | gauplus -b md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js -random-agent | uro | tee {{OUTPUT_GAUPLUS}}
       - cat {{OUTPUT_HTTPX}} | hakrawler | uro | tee {{OUTPUT_HAKRAWLER}}
-      - katana -list {{OUTPUT_HTTPX}} -d 15 -silent -f qurl | uro | tee {{OUTPUT_KATANA}}
+      - katana -list {{OUTPUT_HTTPX}} -d 20 -silent -f qurl | uro | tee {{OUTPUT_KATANA}}
       - arjun -i {{OUTPUT_HTTPX}} -oT {{OUTPUT_ARJUN1}}
       - arjun -i {{OUTPUT_HTTPX}} -m POST -oT {{OUTPUT_ARJUN2}}
       - xargs -a {{OUTPUT_HTTPX}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER}}
@@ -149,7 +150,7 @@ modules:
       - cat {{OUTPUT_HTTPX}} | gau -subs | grep -iE '\.js'| grep -iEv '(\.jsp|\.json)' | tee {{OUTPUT_JS_GAU}}
       - cat {{OUTPUT_HTTPX}} | waybackurls | grep -E '\.js(?:onp?)?$' | anew {{OUTPUT_JS_WAYBACKURLS}}
       - cat {{OUTPUT_HTTPX}} | getJS --complete | anew {{OUTPUT_JS_GETJS}}
-      - cat {{OUTPUT_HTTPX}} | katana -d 15 -silent -em js,jsp,json -o {{OUTPUT_JS_KATANA}}
+      - cat {{OUTPUT_HTTPX}} | katana -d 20 -silent -em js,jsp,json -o {{OUTPUT_JS_KATANA}}
       - cat {{OUTPUT_HTTPX}} | gospider --js | grep -E '\.js(?:onp?)?$' | awk '{print $4}' | tr -d '[]' | anew {{OUTPUT_JS_GOSPIDER}}
       - cat {{OUTPUT_HTTPX}} | xargs -I% -P10 sh -c 'hakrawler -plain -linkfinder -depth 5 -url %' | awk '{{print $3}}' | grep -E '\.js(?:onp?)?$' | anew {{OUTPUT_JS_HAKRAWLER1}}
       - cat {{OUTPUT_HTTPX}} | rush -j 100 'hakrawler -js -plain -usewayback -depth 6 -scope subs -url {} | unew {{OUTPUT_JS_HAKRAWLER2}}'
@@ -208,7 +209,7 @@ modules:
       - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | gau --blacklist md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js | uro | tee {{OUTPUT_GAU_NEW_TARGETS}}
       - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | gauplus -b md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js -random-agent | uro | tee {{OUTPUT_GAUPLUS_NEW_TARGETS}}
       - cat {{OUTPUT_HTTPX_NEW_TARGETS}} | hakrawler | uro | tee {{OUTPUT_HAKRAWLER_NEW_TARGETS}}
-      - katana -list {{OUTPUT_HTTPX_NEW_TARGETS}} -d 15 -silent -f qurl | uro | tee {{OUTPUT_KATANA_NEW_TARGETS}}
+      - katana -list {{OUTPUT_HTTPX_NEW_TARGETS}} -d 20 -silent -f qurl | uro | tee {{OUTPUT_KATANA_NEW_TARGETS}}
       - arjun -i {{OUTPUT_HTTPX_NEW_TARGETS}} -oT {{OUTPUT_ARJUN1_NEW_TARGETS}}
       - arjun -i {{OUTPUT_HTTPX_NEW_TARGETS}} -m POST -oT {{OUTPUT_ARJUN2_NEW_TARGETS}}
       - xargs -a {{OUTPUT_HTTPX_NEW_TARGETS}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER_NEW_TARGETS}}
@@ -296,6 +297,7 @@ modules:
   - name: CRLF Injection
     cmds:
       - crlfsuite -i {{OUTPUT_HTTPX_NEW_TARGETS}} -t {{WORKERS}} -sB | tee {{OUTPUT_CRLF}}
+      - cat {{OUTPUT_ALL_ALIVE_ENDPOINTS}} | crlfuzz -c {{WORKERS}} -o {{OUTPUT_CRLFUZZ}}
     silent: true
     
   - name: Prototype Pollution
@@ -307,4 +309,4 @@ modules:
   - name: HTTP Header Analysis
     cmds:
       - xargs -a {{OUTPUT_HTTPX_NEW_TARGETS}} -n 1 -P 10 headerpwn -headers ~/Wordlists/headers.txt -q -url | tee {{OUTPUT_HEADERPWN}}
-    silent: true                      
+    silent: true          
