@@ -1,0 +1,34 @@
+vars:
+  OUTPUT_HTTPX: "aliveSubs"
+  OUTPUT_WAYBACKURLS: "waybackurls"
+  OUTPUT_GAUPLUS: "gauplus"
+  OUTPUT_HAKRAWLER: "hakrawler"
+  OUTPUT_KATANA: "katana"
+  OUTPUT_ARJUN1: "arjun1"
+  OUTPUT_ARJUN2: "arjun2"
+  OUTPUT_PARAMSPIDER: "paramspider"
+  
+parallel: false
+modules:
+  - name: Endpoints Enumeration
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | waybackurls | uro | tee {{OUTPUT_WAYBACKURLS}}
+      - cat {{OUTPUT_HTTPX}} | gauplus -b md,jpg,jpeg,gif,css,tif,tiff,png,ttf,txt,woff,woff2,ico,pdf,php,js -random-agent | uro | tee {{OUTPUT_GAUPLUS}}
+      - cat {{OUTPUT_HTTPX}} | hakrawler | uro | tee {{OUTPUT_HAKRAWLER}}
+      - katana -list {{OUTPUT_HTTPX}} -d 20 -silent -f qurl | uro | tee {{OUTPUT_KATANA}}
+      - arjun -i {{OUTPUT_HTTPX}} -oT {{OUTPUT_ARJUN1}}
+      - arjun -i {{OUTPUT_HTTPX}} -m POST -oT {{OUTPUT_ARJUN2}}
+      - xargs -a {{OUTPUT_HTTPX}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER}}
+    silent: true
+  - name: Joining Results
+    cmds:
+      - cat {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}} | uro --filters hasparams | tee {{OUTPUT_ENDPOINTS}}
+    silent: false
+  - name: Cleaning Files
+    cmds:
+      - rm -rf {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}}
+    silent: false
+  - name: Sending Notification
+    cmds:
+      - echo "Endpoints Enum Finished" | notify
+    silent: true
