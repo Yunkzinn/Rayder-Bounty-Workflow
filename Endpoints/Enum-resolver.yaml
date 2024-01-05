@@ -1,0 +1,16 @@
+vars:
+  OUTPUT_ENDPOINTS: "endpoints"
+  WORKERS: "4000"
+  HTTPX_RATE_LIMIT: "300"
+  OUTPUT_ALIVE_ENDPOINTS: "aliveEndpoints"
+  
+parallel: false
+modules:
+  - name: Resolving Endpoints
+    cmds:
+      - cat {{OUTPUT_ENDPOINTS}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} | anew {{OUTPUT_ALIVE_ENDPOINTS}}
+    silent: true
+  - name: Sending Notification
+    cmds:
+      - echo "Resolver Endpoints Finished" | notify
+    silent: true

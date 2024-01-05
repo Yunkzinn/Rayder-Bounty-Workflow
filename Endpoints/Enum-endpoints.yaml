@@ -7,6 +7,7 @@ vars:
   OUTPUT_ARJUN1: "arjun1"
   OUTPUT_ARJUN2: "arjun2"
   OUTPUT_PARAMSPIDER: "paramspider"
+  OUTPUT_ENDPOINTS: "endpoints"
   
 parallel: false
 modules:
