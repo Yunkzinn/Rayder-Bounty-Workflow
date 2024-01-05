@@ -1,0 +1,22 @@
+vars:
+  ALL_SUBS_FILE: "allsubs"
+  WORKERS: "4000"
+  RATE: "2000"
+  HTTPX_RATE_LIMIT: "300"
+  OUTPUT_DNSX: "dnsx"
+  OUTPUT_NAABU: "naabu"
+  OUTPUT_HTTPX: "aliveSubs"
+  
+parallel: false
+modules:
+  - name: Resolving Subdomains
+    cmds:
+      - cat {{ALL_SUBS_FILE}} | dnsx -resp-only -a -silent -t {{WORKERS}} | tee {{OUTPUT_DNSX}}
+      - cat {{ALL_SUBS_FILE}} | naabu -silent -c {{WORKERS}} -rate {{RATE}} -p - | tee {{OUTPUT_NAABU}}
+      - cat {{OUTPUT_NAABU}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX}}
+    silent: true
+    - name: Sending Notification
+    cmds:
+      - echo "Subs Resolver Finished" | notify
+    silent: true
+    

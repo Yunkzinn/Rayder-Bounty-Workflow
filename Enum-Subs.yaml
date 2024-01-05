@@ -1,0 +1,35 @@
+vars:
+  TARGET: "domain.com"
+  HAKTRAILS: "haktrails"
+  SUBFINDER: "subfinder"
+  AMASS1: "amass1"
+  AMASS2: "amass2"
+  AMASS3: "amass3"
+  CHAOS: "chaos"
+  ASSETFINDER: "assetfinder"
+  ALL_SUBS_FILE: "allsubs"
+  
+parallel: false
+modules:
+  - name: Subdomain Enumeration
+    cmds:
+      - echo {{TARGET}} | haktrails subdomains | tee {{HAKTRAILS}}
+      - subfinder -d {{TARGET}} -all -o {{SUBFINDER}}
+      - amass enum -norecursive -passive -d {{TARGET}} -o {{AMASS1}}
+      - amass enum -norecursive -brute -d {{TARGET}} -o {{AMASS2}}
+      - amass enum -active -d {{TARGET}} -o {{AMASS3}}
+      - chaos -d {{TARGET}} -silent -o {{CHAOS}}
+      - assetfinder -subs-only {{TARGET}} | tee {{ASSETFINDER}}
+    silent: true
+  - name: Joining Results
+    cmds:
+      - cat {{HAKTRAILS}} {{SUBFINDER}} {{AMASS1}} {{AMASS2}} {{AMASS3}} {{CHAOS}} {{ASSETFINDER}} | anew {{ALL_SUBS_FILE}}
+    silent: false
+  - name: Cleaning Files
+    cmds:
+      - rm -rf {{HAKTRAILS}} {{SUBFINDER}} {{AMASS1}} {{AMASS2}} {{AMASS3}} {{CHAOS}} {{ASSETFINDER}}
+    silent: false
+  - name: Sending Notification
+    cmds:
+      - echo "Subs Enum Finished" | notify
+    silent: true
