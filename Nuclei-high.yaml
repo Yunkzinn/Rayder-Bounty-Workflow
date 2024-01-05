@@ -1,0 +1,11 @@
+vars:
+  OUTPUT_HTTPX: "aliveSubs"
+  OUTPUT_NUCLEI_HIGH: "nuclei_high"
+  
+parallel: false
+modules:
+  - name: Nuclei High
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | nuclei -etags ssl,netlify -severity high -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI_HIGH}} | notify
+    silent: true
+    

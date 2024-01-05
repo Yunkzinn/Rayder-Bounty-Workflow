@@ -1,0 +1,11 @@
+vars:
+  OUTPUT_HTTPX: "aliveSubs"
+  OUTPUT_NUCLEI_MEDIUM: "nuclei_medium"
+  
+parallel: false
+modules:
+  - name: Nuclei Medium
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | nuclei -etags ssl,netlify -severity medium -t ~/nuclei-templates/ -o {{OUTPUT_NUCLEI_MEDIUM}} | notify
+    silent: true
+    
