@@ -1,0 +1,13 @@
+OUTPUT_JUST_JS: "justJS"
+OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
+
+parallel: false
+modules:
+- name: Resolving JS
+    cmds:
+      - cat {{OUTPUT_JUST_JS}} | anti-burl | anew {{OUTPUT_ALIVE_JUST_JS}}
+    silent: true
+- name: Sending Notification
+    cmds:
+      - echo "JS Resolver Finished" | notify
+    silent: true
