@@ -1,5 +1,6 @@
-OUTPUT_JUST_JS: "justJS"
-OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
+vars:
+  OUTPUT_JUST_JS: "justJS"
+  OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
 
 parallel: false
 modules:

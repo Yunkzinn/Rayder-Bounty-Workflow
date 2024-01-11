@@ -1,13 +1,14 @@
-OUTPUT_HTTPX: "aliveSubs"
-OUTPUT_JS_GAU: "gauJS"
-OUTPUT_JS_GETJS: "getJS"
-OUTPUT_JS_KATANA: "katanaJS"
-OUTPUT_JS_GOSPIDER: "gospiderJS"
-OUTPUT_JS_HAKRAWLER1: "hakrawler1JS"
-OUTPUT_JS_HAKRAWLER2: "hakrawler2JS"
-OUTPUT_JS_DIRSEARCH: "dirsearchJS"
-OUTPUT_ALL_JS: "allJS"
-OUTPUT_JUST_JS: "justJS"
+vars:
+  OUTPUT_HTTPX: "aliveSubs"
+  OUTPUT_JS_GAU: "gauJS"
+  OUTPUT_JS_GETJS: "getJS"
+  OUTPUT_JS_KATANA: "katanaJS"
+  OUTPUT_JS_GOSPIDER: "gospiderJS"
+  OUTPUT_JS_HAKRAWLER1: "hakrawler1JS"
+  OUTPUT_JS_HAKRAWLER2: "hakrawler2JS"
+  OUTPUT_JS_DIRSEARCH: "dirsearchJS"
+  OUTPUT_ALL_JS: "allJS"
+  OUTPUT_JUST_JS: "justJS"
 
 parallel: false
 modules:

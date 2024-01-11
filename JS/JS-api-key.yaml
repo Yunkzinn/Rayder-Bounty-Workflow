@@ -1,5 +1,6 @@
-OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
-OUTPUT_MANTRA: "mantra"
+vars:
+  OUTPUT_ALIVE_JUST_JS: "aliveJustJS"
+  OUTPUT_MANTRA: "mantra"
 
 parallel: false
 modules:
