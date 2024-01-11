@@ -1,0 +1,17 @@
+vars:
+  OUTPUT_HTTPX: "aliveSubs"
+  WORKERS: "4000"
+  HTTPX_RATE_LIMIT: "300"
+  OUTPUT_403_ENDPOINTS_HTTPX: "403endpoints"
+
+parallel: false
+modules:
+  - name: Identify Endpoints 403
+    cmds:
+      - cat {{OUTPUT_HTTPX}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -mc 403 | {{OUTPUT_403_ENDPOINTS_HTTPX}}
+    silent: true
+
+  - name: Sending Notification
+    cmds:
+      - echo "Enum Endpoints 403 Finished" | notify
+    silent: true
