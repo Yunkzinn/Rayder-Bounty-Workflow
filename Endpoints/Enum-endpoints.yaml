@@ -21,14 +21,17 @@ modules:
       - arjun -i {{OUTPUT_HTTPX}} -m POST -oT {{OUTPUT_ARJUN2}}
       - xargs -a {{OUTPUT_HTTPX}} -I@ bash -c 'python3 ~/Tools/ParamSpider/paramspider.py -d @ --level high -e md,jpg,jpeg,gif,css,tif,tiff,png,ttf,woff,woff2,ico,pdf,php,js,txt' | uro | tee {{OUTPUT_PARAMSPIDER}}
     silent: true
+
   - name: Joining Results
     cmds:
       - cat {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}} | uro --filters hasparams | tee {{OUTPUT_ENDPOINTS}}
     silent: false
+
   - name: Cleaning Files
     cmds:
       - rm -rf {{OUTPUT_WAYBACKURLS}} {{OUTPUT_GAUPLUS}} {{OUTPUT_HAKRAWLER}} {{OUTPUT_KATANA}} {{OUTPUT_ARJUN1}} {{OUTPUT_ARJUN2}} {{OUTPUT_PARAMSPIDER}}
     silent: false
+    
   - name: Sending Notification
     cmds:
       - echo "Endpoints Enum Finished" | notify

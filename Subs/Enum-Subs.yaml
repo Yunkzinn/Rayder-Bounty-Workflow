@@ -15,14 +15,17 @@ modules:
       - amass enum -norecursive -brute -d {{TARGET}} -o {{AMASS2}}
       - amass enum -active -d {{TARGET}} -o {{AMASS3}}
     silent: true
+
   - name: Joining Results
     cmds:
       - cat {{SUBFINDER}} {{AMASS1}} {{AMASS2}} {{AMASS3}} | anew {{ALL_SUBS_FILE}}
     silent: false
+
   - name: Cleaning Files
     cmds:
       - rm -rf {{SUBFINDER}} {{AMASS1}} {{AMASS2}} {{AMASS3}}
     silent: false
+    
   - name: Sending Notification
     cmds:
       - echo "Subs Enum Finished" | notify

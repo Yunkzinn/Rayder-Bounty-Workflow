@@ -8,6 +8,7 @@ modules:
     cmds:
         - cat {{OUTPUT_ALIVE_JUST_JS}} | mantra | tee {{OUTPUT_MANTRA}}
     silent: true
+    
   - name: Sending Notification
       cmds:
         - echo "JS Api Key Finished" | notify

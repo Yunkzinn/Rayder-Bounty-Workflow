@@ -22,18 +22,22 @@ modules:
       - cat {{OUTPUT_HTTPX}} | rush -j 100 'hakrawler -js -plain -usewayback -depth 6 -scope subs -url {} | unew {{OUTPUT_JS_HAKRAWLER2}}'
       - cat {{OUTPUT_HTTPX}} | xargs -I@ sh -c 'python3 ~/Tools/dirsearch/dirsearch.py -r -b -w path -u @ -i 200 -e json,js,jsp' | tee {{OUTPUT_JS_DIRSEARCH}}
     silent: true
+
   - name: Joining Results
     cmds:
       - cat {{OUTPUT_JS_GAU}} {{OUTPUT_JS_GETJS}} {{OUTPUT_JS_KATANA}} {{OUTPUT_JS_GOSPIDER}} {{OUTPUT_JS_HAKRAWLER1}} {{OUTPUT_JS_HAKRAWLER2}} {{OUTPUT_JS_DIRSEARCH}} | anew {{OUTPUT_ALL_JS}}
     silent: false
+
   - name: Separating JS
     cmds:
       - - cat {{OUTPUT_ALL_JS}} | grep -E '\.js$' | sort -u | tee {{OUTPUT_JUST_JS}}
-    silent: false  
+    silent: false
+
   - name: Cleaning Files
     cmds:
       - rm -rf {{OUTPUT_JS_GAU}} {{OUTPUT_JS_GETJS}} {{OUTPUT_JS_KATANA}} {{OUTPUT_JS_GOSPIDER}} {{OUTPUT_JS_HAKRAWLER1}} {{OUTPUT_JS_HAKRAWLER2}} {{OUTPUT_JS_DIRSEARCH}}
     silent: false
+    
   - name: Sending Notification
     cmds:
       - echo "JS Enum Finished" | notify
