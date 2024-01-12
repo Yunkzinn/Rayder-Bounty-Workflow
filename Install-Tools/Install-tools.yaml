@@ -1,0 +1,55 @@
+vars:
+
+parallel: false
+modules:
+  - name: Install Tools
+    cmds:
+      - go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+      - go install -v github.com/owasp-amass/amass/v4/...@master
+      - go install -v github.com/tomnomnom/anew@latest
+      - go install -v github.com/projectdiscovery/notify/cmd/notify@latest
+      - go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+      - go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+      - go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+      - go install -v github.com/tomnomnom/waybackurls@latest
+      - go install -v github.com/lc/gau/v2/cmd/gau@latest
+      - go install -v github.com/bp0lr/gauplus@latest
+      - go install -v github.com/hakluke/hakrawler@latestawler
+      - go install -v github.com/projectdiscovery/katana/cmd/katana@latest
+      - go install -v github.com/003random/getJS@latest
+      - go install -v github.com/jaeles-project/gospider@latest
+      - go install -v github.com/tomnomnom/hacks/anti-burl@latest
+      - go install -v github.com/MrEmpy/mantra@latest
+      - go install -v github.com/dwisiswant0/crlfuzz/cmd/crlfuzz@latest
+      - go install -v github.com/ffuf/ffuf/v2@latest
+      - go install -v github.com/tomnomnom/gf@latest
+      - go install -v github.com/tomnomnom/qsreplace@latest
+      - go install -v github.com/haccer/subjack@latest
+      - go install -v github.com/LukaSikic/subzy@latest
+      - go install -v github.com/KathanP19/Gxss@latest
+      - pip3 install arjun
+      - pip3 install uro
+      - pip3 install dirsearch
+      - pip3 install crlfsuite
+      - cargo install ppfuzz
+    silent: true
+
+  - name: Install Python Tools
+    cmds:
+      - mkdir ~/Tools
+      - cd ~/Tools
+      - git clone https://github.com/devanshbatham/paramspider
+      - cd paramspider
+      - pip install .
+      - cd ..
+      - git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+      - git clone https://github.com/kleiton0x00/ppmap.git
+      - chmod +x ppmap
+      - cd ppmap/ && bash setup.sh
+      - cd ..
+      -  git clone https://github.com/devanshbatham/openredirex
+      -  cd openredirex
+      -  sudo chmod +x setup.sh
+      -  ./setup.sh
+      - cd ..
+    silent: true
