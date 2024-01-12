@@ -33,6 +33,11 @@ modules:
       - pip3 install crlfsuite
       - cargo install ppfuzz
     silent: true
+  
+  - name: Moving Go Tools
+    cmds:
+      - mv ~/go/bin/* /usr/bin
+    silent: true
 
   - name: Install Python Tools
     cmds:
@@ -47,9 +52,9 @@ modules:
       - chmod +x ppmap
       - cd ppmap/ && bash setup.sh
       - cd ..
-      -  git clone https://github.com/devanshbatham/openredirex
-      -  cd openredirex
-      -  sudo chmod +x setup.sh
-      -  ./setup.sh
+      - git clone https://github.com/devanshbatham/openredirex
+      - cd openredirex
+      - sudo chmod +x setup.sh
+      - ./setup.sh
       - cd ..
     silent: true
