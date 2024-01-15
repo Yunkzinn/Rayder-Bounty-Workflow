@@ -37,7 +37,6 @@ rayder -w path/to/workflow.yaml
 
 <details>
   <summary>Instalação das tools necessárias</summary>
-<<<<<<< HEAD
   
 Instala as seguintes tools:
 
@@ -64,14 +63,6 @@ Instala as seguintes tools:
 * Subjack
 * Subzy
 * Gxss
-=======
-
-<br>
-
-Descrição breve do que este módulo faz.
-
-<br>
->>>>>>> 518af10873d8540101e8f3d187ee2aad824f3f3d
   
 </details>
 <details>
