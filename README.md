@@ -136,8 +136,26 @@ rayder -w path/to/JS/JS-api-key.yaml
 
 <br>
 
-Descrição breve do que este módulo faz.
+A etapa de enumeração e validação dos endpoints utiliza as seguintes tools:
 
+* Gauplus
+* Hakrawler
+* Katana
+* Arjun
+* Paramspider
+* Httpx
+* Notify
+
+Para executar o workflow de **enumeração**:
+
+```sh
+rayder -w path/to/Endpoints/Enum-endpoints.yaml
+```
+Para executar o workflow de **validação**:
+
+```sh
+rayder -w path/to/Endpoints/Enum-resolver.yaml
+```
 <br>
   
 </details>
