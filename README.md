@@ -1,4 +1,4 @@
-# Rayder Bounty Workflow
+<h1 align="center">Rayder Bounty Workflow</h1>
 
 <p align="center">
   <a href="#sobre">Sobre</a> •
@@ -6,7 +6,7 @@
   <a href="#uso">Uso</a> •
   <a href="#módulos-disponíveis">Módulos</a> •
   <a href="#coming-soon-features">Coming Soon</a> •
-  <a href="#contribuições">Contribua</a> •
+  <a href="#contribuições">Contribua</a> 
 </p>
 
 ![rayder](https://github.com/devanshbatham/rayder/blob/main/static/banner.png?raw=true)
