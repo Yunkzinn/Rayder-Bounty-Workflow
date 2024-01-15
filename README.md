@@ -98,6 +98,14 @@ Descrição breve do que este módulo faz.
   
 </details>
 
+## Coming Soon Features
+
+* Bypass 403 
+* Extração de subdominínios por JS
+* Extração de endpoints por JS
+* Template para automação de monitoramento
+* Template para integração dos templates com bot telegram
+
 ## Contribuições
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir problemas, enviar solicitações de pull ou sugerir melhorias para os templates existentes.
