@@ -51,6 +51,7 @@ Instala as seguintes tools:
 * Gau
 * Gauplus
 * Hakrawler
+* Dirsearch
 * Katana
 * GetJS
 * Gospider
@@ -94,11 +95,38 @@ rayder -w path/to/Subs-resolver.yaml
   
 </details>
 <details>
-  <summary>Enumeração e validação de JavaScript</summary>
+  <summary>Enumeração, validação e análise de JavaScript</summary>
 
 <br>
 
-Descrição breve do que este módulo faz.
+A etapa de enumeração, validação e análise de JavaScript utiliza as seguintes tools:
+
+* Gau
+* GetJS
+* Katana
+* Gospider
+* Hakrawler
+* Dirsearch
+* Anti-burl
+* Mantra
+* Notify
+
+Para executar o workflow de **enumeração**:
+
+```sh
+rayder -w path/to/JS/Enum-JS.yaml 
+```
+Para executar o workflow de **validação**:
+
+```sh
+rayder -w path/to/JS/JS-resolver.yaml
+```
+
+Para executar o workflow de **análise**:
+
+```sh
+rayder -w path/to/JS/JS-api-key.yaml
+```
 
 <br>
   
