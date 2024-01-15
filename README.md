@@ -64,6 +64,12 @@ Instala as seguintes tools:
 * Subjack
 * Subzy
 * Gxss
+
+Para executar o workflow de **instalação**:
+
+```sh
+rayder -w path/to/Install-Tools/Install-tools.yaml
+```
   
 </details>
 <details>
