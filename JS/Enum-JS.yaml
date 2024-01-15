@@ -30,7 +30,7 @@ modules:
 
   - name: Separating JS
     cmds:
-      - - cat {{OUTPUT_ALL_JS}} | grep -E '\.js$' | sort -u | tee {{OUTPUT_JUST_JS}}
+      -  cat {{OUTPUT_ALL_JS}} | grep -E '\.js$' | sort -u | tee {{OUTPUT_JUST_JS}}
     silent: false
 
   - name: Cleaning Files

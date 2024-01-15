@@ -1,4 +1,13 @@
-# Rayder Bounty Workflow
+<h1 align="center">Rayder Bounty Workflow</h1>
+
+<p align="center">
+  <a href="#sobre">Sobre</a> •
+  <a href="#instalação-do-rayder">Instalação</a> •
+  <a href="#uso">Uso</a> •
+  <a href="#módulos-disponíveis">Módulos</a> •
+  <a href="#coming-soon-features">Coming Soon</a> •
+  <a href="#contribuições">Contribua</a> 
+</p>
 
 ![rayder](https://github.com/devanshbatham/rayder/blob/main/static/banner.png?raw=true)
 
@@ -28,6 +37,7 @@ rayder -w path/to/workflow.yaml
 
 <details>
   <summary>Instalação das tools necessárias</summary>
+<<<<<<< HEAD
   
 Instala as seguintes tools:
 
@@ -54,35 +64,61 @@ Instala as seguintes tools:
 * Subjack
 * Subzy
 * Gxss
+=======
+
+<br>
+
+Descrição breve do que este módulo faz.
+
+<br>
+>>>>>>> 518af10873d8540101e8f3d187ee2aad824f3f3d
   
 </details>
 <details>
   <summary>Enumeração e validação de Subdomínios</summary>
-  
+
+<br>
+
 Descrição breve do que este módulo faz.
+
+<br>
   
 </details>
 <details>
   <summary>Enumeração e validação de JavaScript</summary>
-  
+
+<br>
+
 Descrição breve do que este módulo faz.
+
+<br>
   
 </details>
 <details>
   <summary>Enumeração e validação de Endpoints</summary>
-  
+
+<br>
+
 Descrição breve do que este módulo faz.
+
+<br>
   
 </details>
 <details>
   <summary>Enumeração e validação de páginas 403 para testes de bypass</summary>
+
+<br>
   
 Descrição breve do que este módulo faz.
+
+<br>
   
 </details>
 <details>
   <summary>Testes de vulnerabilidades</summary>
   
+<br>
+
 1. XSS (Cross-Site Scripting)
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
@@ -119,6 +155,8 @@ Descrição breve do que este módulo faz.
 12. XSS (Cross-Site Scripting)
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
+
+<br>
   
 </details>
 
