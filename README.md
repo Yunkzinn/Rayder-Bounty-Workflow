@@ -37,7 +37,9 @@ rayder -w path/to/workflow.yaml
 
 <details>
   <summary>Instalação das tools necessárias</summary>
-  
+
+<br>
+
 Instala as seguintes tools:
 
 * Subfinder
