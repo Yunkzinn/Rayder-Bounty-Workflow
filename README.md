@@ -72,7 +72,9 @@ Para executar o workflow de **instalação**:
 ```sh
 rayder -w path/to/Install-Tools/Install-tools.yaml
 ```
-  
+
+<br>
+
 </details>
 <details>
   <summary>Enumeração e validação de Subdomínios</summary>
