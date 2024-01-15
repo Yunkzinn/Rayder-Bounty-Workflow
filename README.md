@@ -164,7 +164,21 @@ rayder -w path/to/Endpoints/Enum-resolver.yaml
 
 <br>
   
-Descrição breve do que este módulo faz.
+A etapa de enumeração e validação das páginas 403 utiliza as seguintes tools:
+
+* Httpx
+* Notify
+
+Para executar o workflow de enumeração em **subs 403**:
+
+```sh
+rayder -w path/to/403/Enum-subs-403.yaml
+```
+Para executar o workflow de enumeração em **endpoints 403**:
+
+```sh
+rayder -w path/to/403/Enum-endpoints-403.yaml
+```
 
 <br>
   
