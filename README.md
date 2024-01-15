@@ -79,12 +79,12 @@ A etapa de enumeração e validação dos subdomínios utiliza as seguintes tool
 * Httpx
 * Notify
 
-Para executar o workflow de *enumeração*:
+Para executar o workflow de **enumeração**:
 
 ```sh
 rayder -w path/to/Enum-subs.yaml TARGET=domain.com
 ```
-Para executar o workflow de *validação*:
+Para executar o workflow de **validação**:
 
 ```sh
 rayder -w path/to/Subs-resolver.yaml
