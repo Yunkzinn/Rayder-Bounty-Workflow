@@ -188,40 +188,43 @@ rayder -w path/to/403/Enum-endpoints-403.yaml
   
 <br>
 
-1. XSS (Cross-Site Scripting)
+1. Nuclei
+* Descrição breve do que este módulo faz. 
+* Exemplo de uso e configuração.
+2. XSS
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-2. XSS (Cross-Site Scripting)
+3. Takeover
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-3. XSS (Cross-Site Scripting)
+4. SSTI
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-4. XSS (Cross-Site Scripting)
+5. SSTI
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-5. XSS (Cross-Site Scripting)
+6. SSRF
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-6. XSS (Cross-Site Scripting)
+7. SQLI
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-7. XSS (Cross-Site Scripting)
+8. Prototype Pollution
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-8. XSS (Cross-Site Scripting)
+9. Open Redirect
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-9. XSS (Cross-Site Scripting)
+10. LFI
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-10. XSS (Cross-Site Scripting)
+11. Fuzzing Templates
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-11. XSS (Cross-Site Scripting)
+12. CRLF
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
-12. XSS (Cross-Site Scripting)
+13. Bypass 403
 * Descrição breve do que este módulo faz.
 * Exemplo de uso e configuração.
 
