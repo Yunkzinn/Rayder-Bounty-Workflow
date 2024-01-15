@@ -70,7 +70,20 @@ Instala as seguintes tools:
 
 <br>
 
-Descrição breve do que este módulo faz.
+A etapa de enumeração e validação dos subdomínios utiliza as seguintes tools:
+
+* Amass
+* Subfinder
+* DnsX
+* Naabu
+* Httpx
+* Notify
+
+Para executar esse workflow:
+
+```sh
+rayder -w path/to/Enum-subs.yaml TARGET=domain.com
+```
 
 <br>
   
