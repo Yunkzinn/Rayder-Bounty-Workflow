@@ -1,5 +1,14 @@
 # Rayder Bounty Workflow
 
+<p align="center">
+  <a href="#sobre">Sobre</a> •
+  <a href="#instalação-do-rayder">Instalação</a> •
+  <a href="#uso">Uso</a> •
+  <a href="#módulos-disponíveis">Módulos</a> •
+  <a href="#coming-soon-features">Coming Soon</a> •
+  <a href="#contribuições">Contribua</a> •
+</p>
+
 ![rayder](https://github.com/devanshbatham/rayder/blob/main/static/banner.png?raw=true)
 
 ## Sobre
