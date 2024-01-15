@@ -27,6 +27,12 @@ rayder -w path/to/workflow.yaml
 ## Módulos Disponíveis
 
 <details>
+  <summary>Instalação das tools necessárias</summary>
+  
+Descrição breve do que este módulo faz.
+  
+</details>
+<details>
   <summary>Enumeração e validação de Subdomínios</summary>
   
 Descrição breve do que este módulo faz.
@@ -92,6 +98,6 @@ Descrição breve do que este módulo faz.
   
 </details>
 
-##Contribuições
+## Contribuições
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir problemas, enviar solicitações de pull ou sugerir melhorias para os templates existentes.
