@@ -29,7 +29,31 @@ rayder -w path/to/workflow.yaml
 <details>
   <summary>Instalação das tools necessárias</summary>
   
-Descrição breve do que este módulo faz.
+Instala as seguintes tools:
+
+* Subfinder
+* Amass
+* Anew
+* Notify
+* Dnsx
+* Naabu
+* Httpx
+* Waybackurls
+* Gau
+* Gauplus
+* Hakrawler
+* Katana
+* GetJS
+* Gospider
+* Anti-burl
+* Mantra
+* Crlfuzz
+* Ffuz
+* Gf
+* Qsreplace
+* Subjack
+* Subzy
+* Gxss
   
 </details>
 <details>
