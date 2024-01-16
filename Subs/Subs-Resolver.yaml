@@ -16,7 +16,7 @@ modules:
       - cat {{OUTPUT_NAABU}} | httpx -silent -t {{WORKERS}} -rl {{HTTPX_RATE_LIMIT}} -o {{OUTPUT_HTTPX}}
     silent: true
     
-    - name: Sending Notification
+  - name: Sending Notification
     cmds:
       - echo "Subs Resolver Finished" | notify
     silent: true
